@@ -7,18 +7,43 @@ output:
 
 
 ## Loading and preprocessing the data
-
-
+```{r}
+activity <- read.csv("activity.csv")
+```
 
 ## What is mean total number of steps taken per day?
+1.Total steps per day
+```{r}
+StepsPerDay <- aggregate(activity$steps, list(activity$date), FUN=sum)
+colnames(StepsPerDay) <- c("Date", "Steps")
+StepsPerDay
+```
+2. Make a histogram of the total number of steps taken each day
 
+```{r}
+hist(StepsPerDay[,2],main='Steps per Day' ,col='blue')
+```
+3.Calculate and report the **mean** and **median** total number of steps taken per day
 
-
+```{r}
+mean(StepsPerDay[,2],na.rm=TRUE)
+median(StepsPerDay[,2],na.rm=TRUE)
+```
 ## What is the average daily activity pattern?
+```{r}
+StepsPerTime <- aggregate(steps~interval,data=activity,FUN=mean,na.action=na.omit)
+plot(StepsPerTime,type='l',col='green',main="Average steps per time interval",xlab="Time" ,ylab="Steps")
+```
+
+# table for dplyr
+
+library(dplyr)
+ST <- tbl_df(StepsPerTime)
+# find the column
+ST %>% select(time, steps) %>% filter(steps==max(ST$steps))
 
 
-
-## Imputing missing values
+## Imputing missing values,
 
 
 

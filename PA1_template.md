@@ -1,8 +1,10 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: 'Reproducible Research: Peer Assessment 1'
+author: 'L. Somuray'
+date: '11/21/2020'
+output:
+  html_document: 
+    keep_md: True
 ---
 
 ## Loading and preprocessing the data
@@ -187,7 +189,8 @@ head(imputed_dataset)
 4.Make a histogram of the total number of steps taken each day and Calculate and report the **mean** and **median** total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 ```r
-hist(imputed_dataset[,1],col='red',main='Imputed Activities Dataset',xlab='steps')
+impdata <- aggregate(steps ~ date,imputed_dataset,sum, na.rm = TRUE)
+hist(impdata$steps, xlab= "Total steps per day",col='blue',main='Mean Imputed dataset')
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
@@ -230,30 +233,17 @@ head(imputed_dataset)
 ## 6 37.3826 2012-10-01       25  weekday
 ```
 
-
-
 ```r
-StepsPerDaytype <- aggregate(imputed_dataset$steps, list(imputed_dataset$dateType), FUN=mean)
-
-names(StepsPerDaytype)<-c('dateType','aveSteps')
-barplot(StepsPerDaytype[,2],names.arg= StepsPerDaytype[,1],col='red',ylab='steps',xlab='Date Type')
+imputed_dataset$daytype <- factor(imputed_dataset$dateType, levels=c("weekday","weekend"))
+newintervalmean <- aggregate(x=list(mean=imputed_dataset$steps), 
+                          by=list(interval=imputed_dataset$interval, dateType=imputed_dataset$dateType), 
+                          FUN=mean, 
+                          na.rm=TRUE)
+ggplot(newintervalmean, aes(interval,mean))+geom_line()+facet_grid(newintervalmean$dateType~.)+
+  labs(y="average steps", title="Average steps over 5 minute intervals")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
-Average steps per interval
 
-```r
-StepsPerInterval <- aggregate(imputed_dataset$steps, list(imputed_dataset$interval), FUN=mean)
-colnames(StepsPerInterval) <- c("interval", "steps")
-head(StepsPerInterval)
-```
 
-```
-##   interval    steps
-## 1        0 6.394439
-## 2        5 5.197718
-## 3       10 5.017390
-## 4       15 5.033784
-## 5       20 4.968210
-## 6       25 6.722308
-```
+
